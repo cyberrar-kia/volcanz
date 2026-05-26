@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Volcanz Digital — Website Redesign Proposal</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@200;300;400;500;600;700&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#060608;
+  --s1:#0c0c10;
+  --s2:#12121a;
+  --lava:#ff4500;
+  --lava2:#ff6a2f;
+  --magma:#ff8c00;
+  --glow:rgba(255,69,0,0.15);
+  --glow2:rgba(255,69,0,0.08);
+  --t:#f0ede8;
+  --t2:#8888a0;
+  --t3:#444456;
+  --b1:rgba(255,255,255,0.06);
+  --b2:rgba(255,69,0,0.2);
+  --w:#fff;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{font-size:16px}
+body{
+  background:var(--bg);color:var(--t);
+  font-family:'Outfit',sans-serif;
+  overflow:hidden;
+  -webkit-font-smoothing:antialiased;
+  height:100vh;width:100vw;
+}
+
+/* ── GRAIN ── */
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)' opacity='0.05'/%3E%3C/svg%3E");
+  pointer-events:none;z-index:0;opacity:.8;
+}
+
+/* ── LAVA GLOW BG ── */
+.lava-orb{
+  position:fixed;pointer-events:none;border-radius:50%;filter:blur(120px);z-index:0;
+  animation:orbDrift 12s ease-in-out infinite;
+}
+.lo1{width:500px;height:500px;background:rgba(255,69,0,0.12);top:-100px;right:-100px;animation-delay:0s}
+.lo2{width:400px;height:400px;background:rgba(255,140,0,0.08);bottom:-100px;left:-100px;animation-delay:-5s}
+.lo3{width:300px;height:300px;background:rgba(255,69,0,0.06);top:50%;left:50%;transform:translate(-50%,-50%);animation-delay:-3s}
+@keyframes orbDrift{
+  0%,100%{transform:scale(1) translate(0,0)}
+  33%{transform:scale(1.1) translate(20px,-20px)}
+  66%{transform:scale(0.95) translate(-15px,15px)}
+}
+
+/* ── SLIDES CONTAINER ── */
+.deck{
+  position:relative;z-index:1;
+  width:100vw;height:100vh;
+  overflow:hidden;
+}
+.slide{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;
+  justify-content:center;align-items:center;
+  padding:60px 48px;
+  opacity:0;pointer-events:none;
+  transform:translateY(40px);
+  transition:opacity .6s ease,transform .6s ease;
+}
+.slide.active{
+  opacity:1;pointer-events:all;
+  transform:translateY(0);
+}
+.slide.exit-up{opacity:0;transform:translateY(-40px)}
+
+/* ── PROGRESS BAR ── */
+.progress{
+  position:fixed;top:0;left:0;height:2px;
+  background:linear-gradient(90deg,var(--lava),var(--magma));
+  transition:width .4s ease;z-index:100;
+  box-shadow:0 0 12px var(--lava);
+}
+
+/* ── NAV DOTS ── */
+.nav-dots{
+  position:fixed;right:24px;top:50%;transform:translateY(-50%);
+  display:flex;flex-direction:column;gap:8px;z-index:100;
+}
+.ndot{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--t3);border:none;cursor:pointer;
+  transition:all .3s;padding:0;
+}
+.ndot.active{background:var(--lava);box-shadow:0 0 8px var(--lava);height:20px;border-radius:3px}
+
+/* ── SLIDE NUMBER ── */
+.slide-num{
+  position:fixed;bottom:32px;left:48px;
+  font-family:'DM Mono',monospace;
+  font-size:11px;color:var(--t3);letter-spacing:.1em;z-index:100;
+}
+
+/* ── NAV BUTTONS ── */
+.nav-btns{
+  position:fixed;bottom:24px;right:48px;
+  display:flex;gap:10px;z-index:100;
+}
+.nav-btn{
+  width:44px;height:44px;border-radius:2px;
+  border:1px solid var(--b1);background:rgba(12,12,16,0.8);
+  color:var(--t2);font-size:18px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .2s;backdrop-filter:blur(10px);
+}
+.nav-btn:hover{border-color:var(--lava);color:var(--lava);box-shadow:0 0 12px var(--glow)}
+.nav-btn:disabled{opacity:.3;cursor:default}
+
+/* ── TYPOGRAPHY SYSTEM ── */
+.slide-tag{
+  font-family:'DM Mono',monospace;
+  font-size:10px;letter-spacing:.25em;text-transform:uppercase;
+  color:var(--lava2);margin-bottom:16px;
+  display:flex;align-items:center;gap:8px;
+}
+.slide-tag::before{content:'';width:20px;height:1px;background:var(--lava2)}
+.h-display{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(60px,10vw,120px);
+  line-height:.95;letter-spacing:.02em;
+  color:var(--t);text-align:center;
+}
+.h-display .fire{
+  background:linear-gradient(135deg,var(--lava),var(--magma));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.h-section{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(40px,6vw,72px);
+  line-height:.95;letter-spacing:.02em;color:var(--t);
+}
+.h-section .fire{
+  background:linear-gradient(135deg,var(--lava),var(--magma));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.body-text{
+  font-size:clamp(14px,1.8vw,17px);
+  font-weight:300;line-height:1.75;color:var(--t2);
+  max-width:600px;text-align:center;
+}
+
+/* ── CARDS ── */
+.card-grid{
+  display:grid;gap:12px;width:100%;max-width:1000px;
+}
+.card-3{grid-template-columns:repeat(3,1fr)}
+.card-2{grid-template-columns:repeat(2,1fr)}
+.card{
+  background:var(--s1);border:1px solid var(--b1);
+  padding:28px;position:relative;overflow:hidden;
+  transition:border-color .3s;
+}
+.card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--lava),var(--magma));
+  transform:scaleX(0);transform-origin:left;transition:transform .4s;
+}
+.card:hover{border-color:var(--b2)}
+.card:hover::before{transform:scaleX(1)}
+.card-icon{font-size:28px;margin-bottom:14px;display:block}
+.card-title{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:20px;letter-spacing:.05em;color:var(--t);margin-bottom:8px;
+}
+.card-desc{font-size:12px;font-weight:300;color:var(--t2);line-height:1.65}
+.card-num{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:48px;color:var(--lava);opacity:.3;
+  position:absolute;bottom:16px;right:20px;line-height:1;
+}
+
+/* ── STACK ITEMS ── */
+.stack-list{
+  display:flex;flex-wrap:wrap;gap:8px;justify-content:center;
+  max-width:800px;
+}
+.stack-tag{
+  font-family:'DM Mono',monospace;
+  font-size:11px;letter-spacing:.08em;
+  border:1px solid var(--b1);padding:8px 16px;
+  color:var(--t2);background:var(--s1);
+  transition:all .2s;
+}
+.stack-tag:hover{border-color:var(--lava2);color:var(--t)}
+.stack-tag.hot{border-color:rgba(255,69,0,.3);color:var(--lava2);background:rgba(255,69,0,.06)}
+
+/* ── TIMELINE ── */
+.timeline{width:100%;max-width:900px}
+.trow{
+  display:grid;grid-template-columns:80px 1fr;
+  gap:24px;align-items:start;
+  padding:20px 0;border-bottom:1px solid var(--b1);
+}
+.trow:last-child{border-bottom:none}
+.tweek{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:28px;color:var(--lava);letter-spacing:.05em;
+}
+.ttitle{font-size:14px;font-weight:600;color:var(--t);margin-bottom:4px}
+.tdesc{font-size:12px;font-weight:300;color:var(--t2);line-height:1.6}
+
+/* ── DIVIDER LINE ── */
+.lava-line{
+  width:80px;height:2px;
+  background:linear-gradient(90deg,var(--lava),var(--magma));
+  margin:20px auto;box-shadow:0 0 8px var(--lava);
+}
+
+/* ── CTA BUTTON ── */
+.cta-btn{
+  font-size:13px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--bg);background:linear-gradient(135deg,var(--lava),var(--magma));
+  padding:16px 40px;text-decoration:none;border:none;
+  transition:opacity .2s,transform .2s;display:inline-block;margin-top:8px;
+  box-shadow:0 8px 30px rgba(255,69,0,.3);
+}
+.cta-btn:hover{opacity:.9;transform:translateY(-2px)}
+
+/* ── METRIC BOXES ── */
+.metrics{display:flex;gap:24px;flex-wrap:wrap;justify-content:center;max-width:900px}
+.metric{
+  background:var(--s1);border:1px solid var(--b1);
+  padding:24px 32px;text-align:center;min-width:160px;
+}
+.metric-num{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:48px;color:var(--lava);line-height:1;margin-bottom:4px;
+}
+.metric-label{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--t3)}
+
+/* ── SLIDE-SPECIFIC ── */
+.s1-pre{
+  font-family:'DM Mono',monospace;
+  font-size:11px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--t3);margin-bottom:24px;
+}
+.volcano-icon{
+  font-size:clamp(48px,8vw,80px);
+  margin-bottom:16px;
+  filter:drop-shadow(0 0 20px rgba(255,69,0,0.5));
+  animation:flicker 3s ease-in-out infinite;
+}
+@keyframes flicker{0%,100%{filter:drop-shadow(0 0 20px rgba(255,69,0,0.5))}50%{filter:drop-shadow(0 0 40px rgba(255,69,0,0.8))}}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  .slide{padding:40px 24px}
+  .card-3{grid-template-columns:1fr}
+  .card-2{grid-template-columns:1fr}
+  .nav-dots{display:none}
+  .slide-num{left:24px;bottom:24px}
+  .nav-btns{right:24px;bottom:20px}
+  .trow{grid-template-columns:60px 1fr;gap:16px}
+  .metrics{gap:12px}
+  .metric{min-width:120px;padding:16px 20px}
+}
+@media(max-width:480px){
+  .slide{padding:32px 20px}
+  .h-display{font-size:clamp(48px,14vw,80px)}
+  .nav-btns{gap:8px}
+  .nav-btn{width:38px;height:38px;font-size:15px}
+}
+</style>
+</head>
+<body>
+
+<!-- LAVA ORBS -->
+<div class="lava-orb lo1"></div>
+<div class="lava-orb lo2"></div>
+<div class="lava-orb lo3"></div>
+
+<!-- PROGRESS -->
+<div class="progress" id="progress"></div>
+
+<!-- NAV DOTS -->
+<div class="nav-dots" id="navDots"></div>
+
+<!-- SLIDE NUMBER -->
+<div class="slide-num" id="slideNum">01 / 08</div>
+
+<!-- NAV BUTTONS -->
+<div class="nav-btns">
+  <button class="nav-btn" id="prevBtn" onclick="navigate(-1)">←</button>
+  <button class="nav-btn" id="nextBtn" onclick="navigate(1)">→</button>
+</div>
+
+<!-- DECK -->
+<div class="deck" id="deck">
+
+  <!-- SLIDE 1: COVER -->
+  <div class="slide active" data-slide="1">
+    <div class="volcano-icon">🌋</div>
+    <div class="s1-pre">Website Redesign Proposal — 2025</div>
+    <h1 class="h-display">
+      IGNITE<br><span class="fire">VOLCANZ</span>
+    </h1>
+    <div class="lava-line"></div>
+    <p class="body-text" style="margin-top:0">A cinematic, motion-heavy, AI-powered website that matches the fire of your brand — and burns past the competition.</p>
+    <div style="margin-top:36px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:center">
+      <div style="font-size:12px;color:var(--t3);letter-spacing:.06em">Prepared by</div>
+      <div style="font-size:14px;font-weight:600;color:var(--t)">Joshua Ovbiagele</div>
+      <div style="width:1px;height:16px;background:var(--b1)"></div>
+      <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--lava2)">Full-Stack Developer</div>
+    </div>
+  </div>
+
+  <!-- SLIDE 2: THE PROBLEM -->
+  <div class="slide" data-slide="2">
+    <div class="slide-tag">The challenge</div>
+    <h2 class="h-section" style="text-align:center;margin-bottom:16px">YOUR SITE<br><span class="fire">DOESN'T MATCH</span><br>YOUR BRAND</h2>
+    <div class="lava-line"></div>
+    <p class="body-text" style="margin-bottom:40px">Volcanz Digital is bold, energetic, and volcanic — but your WordPress site is none of those things. You're losing clients before they even read your services.</p>
+    <div class="card-grid card-3" style="max-width:900px">
+      <div class="card">
+        <span class="card-icon">🐌</span>
+        <div class="card-title">Slow & Heavy</div>
+        <div class="card-desc">WordPress themes bloat Core Web Vitals. Clients leave before the page loads.</div>
+        <div class="card-num">01</div>
+      </div>
+      <div class="card">
+        <span class="card-icon">💤</span>
+        <div class="card-title">Static & Flat</div>
+        <div class="card-desc">No motion, no cinematic feel, no interaction. Doesn't match a cutting-edge agency.</div>
+        <div class="card-num">02</div>
+      </div>
+      <div class="card">
+        <span class="card-icon">🔒</span>
+        <div class="card-title">Hard to Update</div>
+        <div class="card-desc">WordPress CMS is clunky. Content changes take too long or break the layout.</div>
+        <div class="card-num">03</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 3: THE VISION -->
+  <div class="slide" data-slide="3">
+    <div class="slide-tag">The vision</div>
+    <h2 class="h-section" style="text-align:center;margin-bottom:16px">CINEMATIC.<br><span class="fire">VOLCANIC.</span><br>FAST.</h2>
+    <div class="lava-line"></div>
+    <p class="body-text" style="margin-bottom:40px">A dark, premium website that feels like lava in motion — bold entrances, smooth scroll sequences, and interactions that make visitors stop and stare. All without killing mobile performance.</p>
+    <div class="metrics">
+      <div class="metric"><div class="metric-num">90+</div><div class="metric-label">PageSpeed Score</div></div>
+      <div class="metric"><div class="metric-num">4</div><div class="metric-label">Pages Delivered</div></div>
+      <div class="metric"><div class="metric-num">2</div><div class="metric-label">Languages (EN/ES)</div></div>
+      <div class="metric"><div class="metric-num">3–4</div><div class="metric-label">Weeks to Launch</div></div>
+    </div>
+  </div>
+
+  <!-- SLIDE 4: TECH STACK -->
+  <div class="slide" data-slide="4">
+    <div class="slide-tag">Technology</div>
+    <h2 class="h-section" style="text-align:center;margin-bottom:16px">THE <span class="fire">STACK</span></h2>
+    <div class="lava-line"></div>
+    <p class="body-text" style="margin-bottom:32px">Every technology chosen for a specific reason — no bloat, no WordPress, no compromise.</p>
+    <div class="stack-list">
+      <div class="stack-tag hot">Next.js 14</div>
+      <div class="stack-tag hot">React 18</div>
+      <div class="stack-tag hot">Framer Motion</div>
+      <div class="stack-tag hot">GSAP + ScrollTrigger</div>
+      <div class="stack-tag">Tailwind CSS</div>
+      <div class="stack-tag hot">Sanity CMS</div>
+      <div class="stack-tag">TypeScript</div>
+      <div class="stack-tag hot">Vercel</div>
+      <div class="stack-tag">next-i18n</div>
+      <div class="stack-tag">Next/Image</div>
+      <div class="stack-tag">next-seo</div>
+      <div class="stack-tag">Lenis Scroll</div>
+    </div>
+    <div style="margin-top:28px;background:var(--s1);border:1px solid var(--b2);padding:16px 24px;max-width:600px;width:100%">
+      <div style="font-size:11px;color:var(--lava2);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px;font-family:'DM Mono',monospace">Why Sanity over Craft CMS</div>
+      <div style="font-size:13px;font-weight:300;color:var(--t2);line-height:1.65">Native Next.js integration · Built-in bilingual support · Real-time visual preview · Free tier · Structured content that can't break your layout</div>
+    </div>
+  </div>
+
+  <!-- SLIDE 5: ANIMATION STRATEGY -->
+  <div class="slide" data-slide="5">
+    <div class="slide-tag">Motion design</div>
+    <h2 class="h-section" style="text-align:center;margin-bottom:16px">MOTION THAT<br><span class="fire">DOESN'T</span><br>BREAK MOBILE</h2>
+    <div class="lava-line"></div>
+    <div class="card-grid card-2" style="max-width:800px">
+      <div class="card">
+        <span class="card-icon">🖥️</span>
+        <div class="card-title">Desktop Experience</div>
+        <div class="card-desc">Full cinematic scroll sequences with GSAP ScrollTrigger. Lava-inspired entrance animations, parallax layers, magnetic hover effects, and smooth page transitions via Framer Motion.</div>
+      </div>
+      <div class="card">
+        <span class="card-icon">📱</span>
+        <div class="card-title">Mobile Experience</div>
+        <div class="card-desc">Heavy effects disabled. Clean fade-ups and slide-ins via Intersection Observer. prefers-reduced-motion respected. Fast load, full polish — no performance sacrifice.</div>
+      </div>
+      <div class="card">
+        <span class="card-icon">⚡</span>
+        <div class="card-title">Performance First</div>
+        <div class="card-desc">Animations use CSS transforms and opacity only — never layout-triggering properties. GPU-accelerated. Will-change used surgically. No janky frames.</div>
+      </div>
+      <div class="card">
+        <span class="card-icon">🎯</span>
+        <div class="card-title">Brand-Matched</div>
+        <div class="card-desc">Volcano / magma colour palette. Ember particles on hero. Molten lava cursor trail on desktop. Dark premium aesthetic throughout — Home, Services, Case Studies, Contact.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 6: TIMELINE -->
+  <div class="slide" data-slide="6">
+    <div class="slide-tag">Delivery plan</div>
+    <h2 class="h-section" style="text-align:center;margin-bottom:24px">3–4 WEEK<br><span class="fire">TIMELINE</span></h2>
+    <div class="timeline">
+      <div class="trow">
+        <div class="tweek">W1</div>
+        <div>
+          <div class="ttitle">Foundation + Design System</div>
+          <div class="tdesc">Next.js setup · Tailwind design tokens · Sanity CMS schema · bilingual structure · motion system architecture</div>
+        </div>
+      </div>
+      <div class="trow">
+        <div class="tweek">W2</div>
+        <div>
+          <div class="ttitle">Core Pages + Animation</div>
+          <div class="tdesc">Home + Services built with full animation suite · GSAP sequences · hero section + scroll effects · mobile optimization</div>
+        </div>
+      </div>
+      <div class="trow">
+        <div class="tweek">W3</div>
+        <div>
+          <div class="ttitle">Case Studies + Contact + CMS</div>
+          <div class="tdesc">Remaining pages · Sanity studio fully wired · EN/ES content management · WordPress migration</div>
+        </div>
+      </div>
+      <div class="trow">
+        <div class="tweek">W4</div>
+        <div>
+          <div class="ttitle">QA + SEO + Launch</div>
+          <div class="tdesc">Core Web Vitals audit · SEO metadata · Vercel deployment · final review · handover + documentation</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 7: WHY ME -->
+  <div class="slide" data-slide="7">
+    <div class="slide-tag">Why Joshua</div>
+    <h2 class="h-section" style="text-align:center;margin-bottom:16px">I BUILD<br><span class="fire">BEFORE</span><br>I PITCH</h2>
+    <div class="lava-line"></div>
+    <p class="body-text" style="margin-bottom:36px">I don't describe what I'll build — I build it and show you. Every proposal I send comes with working code. That's how I operate.</p>
+    <div class="card-grid card-3" style="max-width:900px">
+      <div class="card">
+        <span class="card-icon">🚀</span>
+        <div class="card-title">Production Shipped</div>
+        <div class="card-desc">fasttrackliteracy.com — live Next.js platform for a US EdTech client. 70+ revisions delivered.</div>
+      </div>
+      <div class="card">
+        <span class="card-icon">🎨</span>
+        <div class="card-title">Design + Code</div>
+        <div class="card-desc">I handle both — no designer needed. You get a unified aesthetic vision and clean implementation.</div>
+      </div>
+      <div class="card">
+        <span class="card-icon">🤖</span>
+        <div class="card-title">AI-Accelerated</div>
+        <div class="card-desc">AI tools in every workflow — faster builds, better code, reusable architecture for future client sites.</div>
+      </div>
+    </div>
+    <div style="margin-top:24px">
+      <a href="https://portfolio-three-alpha-bueev6s7or.vercel.app/" target="_blank" style="font-family:'DM Mono',monospace;font-size:12px;color:var(--lava2);text-decoration:none;letter-spacing:.08em;border-bottom:1px solid rgba(255,106,47,.3);padding-bottom:2px">→ portfolio-three-alpha-bueev6s7or.vercel.app</a>
+    </div>
+  </div>
+
+  <!-- SLIDE 8: CTA -->
+  <div class="slide" data-slide="8">
+    <div class="volcano-icon" style="font-size:clamp(40px,6vw,64px)">🌋</div>
+    <h1 class="h-display" style="margin-bottom:16px">
+      LET'S<br><span class="fire">ERUPT</span>
+    </h1>
+    <div class="lava-line"></div>
+    <p class="body-text" style="margin-bottom:36px">$1,500 · 3–4 weeks · Next.js + Sanity + Framer Motion + GSAP · Deployed on Vercel · English + Spanish</p>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center">
+      <a href="mailto:ovbiageleotaigbe@gmail.com" class="cta-btn">Reply to Get Started</a>
+    </div>
+    <div style="margin-top:32px;display:flex;gap:32px;flex-wrap:wrap;justify-content:center">
+      <div style="text-align:center">
+        <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--t3);letter-spacing:.1em;margin-bottom:4px">EMAIL</div>
+        <div style="font-size:13px;color:var(--t)">ovbiageleotaigbe@gmail.com</div>
+      </div>
+      <div style="text-align:center">
+        <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--t3);letter-spacing:.1em;margin-bottom:4px">PORTFOLIO</div>
+        <div style="font-size:13px;color:var(--t)">portfolio-three-alpha-bueev6s7or.vercel.app</div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /deck -->
+
+<script>
+const slides=document.querySelectorAll('.slide');
+const total=slides.length;
+let current=0;
+let animating=false;
+
+// Build nav dots
+const dotsContainer=document.getElementById('navDots');
+slides.forEach((_,i)=>{
+  const d=document.createElement('button');
+  d.className='ndot'+(i===0?' active':'');
+  d.onclick=()=>goTo(i);
+  dotsContainer.appendChild(d);
+});
+
+function updateUI(){
+  const dots=document.querySelectorAll('.ndot');
+  dots.forEach((d,i)=>d.classList.toggle('active',i===current));
+  document.getElementById('slideNum').textContent=
+    String(current+1).padStart(2,'0')+' / '+String(total).padStart(2,'0');
+  document.getElementById('progress').style.width=
+    ((current+1)/total*100)+'%';
+  document.getElementById('prevBtn').disabled=current===0;
+  document.getElementById('nextBtn').disabled=current===total-1;
+}
+
+function goTo(index){
+  if(animating||index===current||index<0||index>=total)return;
+  animating=true;
+  const outSlide=slides[current];
+  const inSlide=slides[index];
+  const dir=index>current?1:-1;
+
+  outSlide.classList.add(dir>0?'exit-up':'');
+  outSlide.style.transform=dir>0?'translateY(-40px)':'translateY(40px)';
+  outSlide.style.opacity='0';
+
+  inSlide.style.transform=dir>0?'translateY(40px)':'translateY(-40px)';
+  inSlide.style.opacity='0';
+  inSlide.classList.add('active');
+
+  requestAnimationFrame(()=>{
+    requestAnimationFrame(()=>{
+      inSlide.style.transform='translateY(0)';
+      inSlide.style.opacity='1';
+    });
+  });
+
+  setTimeout(()=>{
+    outSlide.classList.remove('active','exit-up');
+    outSlide.style.transform='';
+    outSlide.style.opacity='';
+    current=index;
+    updateUI();
+    animating=false;
+  },600);
+}
+
+function navigate(dir){goTo(current+dir)}
+
+// Keyboard
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'||e.key==='ArrowDown')navigate(1);
+  if(e.key==='ArrowLeft'||e.key==='ArrowUp')navigate(-1);
+});
+
+// Touch swipe
+let touchX=0;
+document.addEventListener('touchstart',e=>touchX=e.touches[0].clientX,{passive:true});
+document.addEventListener('touchend',e=>{
+  const dx=touchX-e.changedTouches[0].clientX;
+  if(Math.abs(dx)>50)navigate(dx>0?1:-1);
+},{passive:true});
+
+// Scroll wheel
+let wheelTimeout;
+document.addEventListener('wheel',e=>{
+  clearTimeout(wheelTimeout);
+  wheelTimeout=setTimeout(()=>navigate(e.deltaY>0?1:-1),50);
+},{passive:true});
+
+updateUI();
+</script>
+</body>
+</html>
